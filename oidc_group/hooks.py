@@ -186,11 +186,14 @@ use_json_request_body = True
 
 # Overriding Methods
 # ------------------------------
-#
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "oidc_group.event.get_events"
-# }
-#
+
+override_whitelisted_methods = {
+	# Override OIDC login endpoints to capture groups from userinfo and sync Frappe roles.
+	# "custom" covers all Social Login Keys (Auth0, Okta, Authentik, etc.)
+	"frappe.integrations.oauth2_logins.custom": "oidc_group.auth.custom",
+	"frappe.integrations.oauth2_logins.login_via_keycloak": "oidc_group.auth.login_via_keycloak",
+}
+
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
