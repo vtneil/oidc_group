@@ -1,13 +1,13 @@
 {
  "actions": [],
- "autoname": "format:{oidc_group}--{role}",
+ "autoname": "field:oidc_group",
  "creation": "2026-07-14 00:00:00.000000",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "oidc_group",
-  "role"
+  "roles"
  ],
  "fields": [
   {
@@ -15,14 +15,14 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "OIDC Group",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
-   "fieldname": "role",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Role",
-   "options": "Role",
+   "fieldname": "roles",
+   "fieldtype": "Table",
+   "label": "Roles",
+   "options": "OIDC Group Role",
    "reqd": 1
   }
  ],
@@ -32,7 +32,7 @@
  "modified_by": "Administrator",
  "module": "OIDC Group",
  "name": "OIDC Group Role Mapping",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

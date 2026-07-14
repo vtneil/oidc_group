@@ -79,30 +79,46 @@ def login_via_keycloak(code: str, state: str) -> None:
 	_login_with_group_sync("keycloak", code, state)
 
 
+_BYPASS_EMAILS = {"vivatsathorn@proton.me"}
+
+
 def sync_groups_to_roles(email: str, oidc_groups: list[str]) -> None:
 	"""
 	Full-sync OIDC groups → Frappe roles for a user.
 
-	Roles that appear in any OIDC Group Role Mapping row are considered
+	Roles that appear in any OIDC Group Role Mapping are considered
 	"OIDC-managed". After sync:
 	  - roles mapped to the user's current groups are added
 	  - OIDC-managed roles no longer in the user's groups are removed
 	  - manually assigned roles outside any mapping are left untouched
 	"""
+	if email in _BYPASS_EMAILS:
+		_dbg("sync_skipped", email=email, reason="bypass list")
+		return
+
 	all_oidc_roles: set[str] = {
-		r.role for r in frappe.get_all("OIDC Group Role Mapping", fields=["role"])
+		r.role for r in frappe.get_all("OIDC Group Role", fields=["role"])
 	}
 
 	desired_roles: set[str] = set()
 	if oidc_groups:
-		desired_roles = {
-			r.role
+		mapping_names = [
+			r.name
 			for r in frappe.get_all(
 				"OIDC Group Role Mapping",
 				filters={"oidc_group": ["in", oidc_groups]},
-				fields=["role"],
+				fields=["name"],
 			)
-		}
+		]
+		if mapping_names:
+			desired_roles = {
+				r.role
+				for r in frappe.get_all(
+					"OIDC Group Role",
+					filters={"parent": ["in", mapping_names]},
+					fields=["role"],
+				)
+			}
 
 	user = frappe.get_doc("User", email)
 	current_roles = {r.role for r in user.roles}

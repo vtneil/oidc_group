@@ -9,6 +9,6 @@ class OIDCGroupRoleMapping(Document):
 	from frappe.types import DF
 
 	oidc_group: DF.Data
-	role: DF.Link
+	roles: DF.Table["OIDCGroupRole"]
 	# end: auto-generated types
 	pass
